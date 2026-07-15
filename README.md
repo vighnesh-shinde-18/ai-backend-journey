@@ -84,38 +84,64 @@ FastAPI is Python Framework for Backend which receiver HTTP request and call pyt
 
 ## Project Architecture 
 ```bash
-app/
-├── main.py
+├──app/
+│   ├── main.py
+│   │
+│   ├── database.py
+│   │
+│   ├── schemas.py
+│   │
+│   ├── models.py
+│   │
+│   ├── config.py
+│   │
+│   ├── routers/
+│   │      users.py
+│   │
+│   ├── services/
+│   │      user_service.py
+│   │
+│   ├── repositories/
+│   │      user_repository.py
+│   │
+│   └── utils/
+│   
+├── example.env
 │
-├── database.py
+├── .env
 │
-├── schemas.py
+├── README.md
 │
-├── models.py
+├── sqlite.db
 │
-├── config.py
+├── requirements.txt
 │
-├── routers/
-│      users.py
-│
-├── services/
-│      user_service.py
-│
-├── repositories/
-│      user_repository.py
-│
-└── utils/
-example.env
-
+└──  .gitignore 
 ```
 
-## Service Layer
-- Instead of Writing Controllers code in Router we move it in Service layer for Seperation of Concern
-- Service Layer have Function which called by Router Layer
-
 ## Dependncy Injection
-- Thanks to Pydentic we can use Function from Service layer directly in Router layer without creating class and object
-- Due to Pydentic Dependancy each folder have _pycache_ folder which enable importing value and methods directly
+- FastAPI uses a powerful Dependency Injection (DI) system. Instead of your API endpoints manually creating the services or database connections they need, FastAPI automatically instantiates and provides ("injects") them at runtime using Depends()
+- It has Loose Coupling, High Modularity, Automatic Lifecycle Management, Effortless Testing
+
+```bash
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close() 
+```
+```bash
+@app.post("/users")
+async def create_user(user_data: CreateUser, db: Session = Depends(get_db)):
+
+```
+- When a user sends a request to the /users endpoint:
+  1. Interception: FastAPI stops and looks at Depends(get_db) 
+  2. Execution: FastAPI runs get_db(), which opens a fresh database session
+  3.Injection: FastAPI injects that active session directly into your db: Session parameter 
+  4. Execution: Your endpoint code runs safely using the provided database session 
+  5. Cleanup: Once the response is sent back to the user, FastAPI executes the finally block to automatically close the database connection, preventing memory leaks.
 
 ## Environment Variable
 - Instead Of hardcoding sensitive values directly in code we store them in env file 
@@ -134,5 +160,27 @@ example.env
       model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
   settings = Settings()
-
   ```
+
+## SQLAlchemy
+- SQLAlchemy is Object Relation Mapping (ORM)
+- Database use SQL and Python use Objects so, SQLAlchemy translate Python Object into SQL
+- Install Command:
+  ```bash
+  pip install sqlalchemy pydantic-settings
+  ```
+
+## Modular Architecture Explain
+
+### Router Layer
+- Router Layer only handle HTTP Request 
+- Router Layer paased request data to Service Layer
+
+### Service Layer
+- Service Layer Containe Business Logic
+- Service Layer use repository layer to perform db opeartion
+
+### Repository Layer
+- Repository Layer Interact with Database which return SQLAlchemy Model
+- SQLAlchemy Model later convert to Response Model and return as JSON
+

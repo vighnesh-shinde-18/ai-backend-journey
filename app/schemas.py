@@ -16,4 +16,8 @@ class ReturnUser(BaseModel):
     name:str
     email:EmailStr
     age:int
-    
+      
+    class Config:
+        from_attributes = True  # Allows Pydantic to read SQLAlchemy ORM objects
+
+ 

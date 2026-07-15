@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.schemas import CodeSubmission
-from app.routers.users import router as users_router
+from app.routers.user_router import router as users_router
 from app.config import settings 
 
 
