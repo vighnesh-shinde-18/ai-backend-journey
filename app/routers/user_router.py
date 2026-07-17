@@ -26,3 +26,4 @@ async def user(user_id:UUID, db:Session=Depends(get_db)):
 @router.delete("/{user_id}")
 async def delete(user_id:UUID,db:Session=Depends(get_db)):
     return user_service.delete_user(user_id,db)
+

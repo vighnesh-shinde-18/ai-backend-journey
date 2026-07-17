@@ -18,6 +18,11 @@ def find_by_id(db:Session, user_id: UUID):
     query = select(User).where(User.id == user_id)
     return db.execute(query).scalar_one_or_none()
  
+def find_by_email(db:Session, email: str):
+    # Using explicit select to ensure correct SQLite type coercion compiler rules
+    query = select(User).where(User.email == email)
+    return db.execute(query).scalar_one_or_none()
+ 
 def count_all(db):
     query = select(func.count(User.id))
     return db.execute(query).scalar_one()

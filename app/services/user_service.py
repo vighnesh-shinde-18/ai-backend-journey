@@ -1,7 +1,6 @@
 from uuid import uuid4, UUID
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func, select
 
 from app.database import engine, Base
 from app.models import User
@@ -27,7 +26,6 @@ def get_users(skip: int, limit: int, db: Session):
      
 
 def get_count(db: Session):
-    query = select(func.count(User.id))
     total_users = user_repository.count_all(db)
     return {
         "total_users": total_users
